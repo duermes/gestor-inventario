@@ -69,10 +69,10 @@ export default function Home() {
         </form>
         <div className="mt-6 text-center text-sm space-y-2">
           <p className="text-gray-600">¿Necesitas ayuda?</p>
-          <a href="#" className="text-pink-600 hover:underline block">
+          <a href="/forgot-password" className="text-pink-600 hover:underline block">
             ¿Olvidaste tu contraseña?
           </a>
-          <a href="#" className="text-pink-600 hover:underline block">
+          <a href="/contact-admin" className="text-pink-600 hover:underline block">
             Contactar al Administrador
           </a>
         </div>

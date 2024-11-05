@@ -15,7 +15,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
             />
             <h1 className="text-3xl font-bold text-pink-900">Top Modas</h1>
           </div>
-          
+          {children}
         </div>
         <footer className="absolute bottom-4 text-center w-full text-white text-sm">
           © 2024 Top Modas. Todos los derechos reservados.
