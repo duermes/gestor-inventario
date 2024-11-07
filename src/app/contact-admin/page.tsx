@@ -15,7 +15,7 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual contact logic
+    // falta implementar lógica
     setIsSubmitted(true);
   };
 

@@ -10,7 +10,7 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual password reset logic
+    // implementar lógica (preferible moverlo a libs y trabajarlo con components)
     setIsSubmitted(true);
   };
 
