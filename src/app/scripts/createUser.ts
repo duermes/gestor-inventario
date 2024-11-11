@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import prisma from "../lib/db";
 
 export async function createUser() {
-  const email = "lorenakimnegrillo@gmail.com";
+  const email = "admin@admin.com";
   const password = "admin123";
   const name = "Lorena";
   const lastName = "Kim";

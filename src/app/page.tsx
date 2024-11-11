@@ -1,5 +1,8 @@
 import Image from "next/image";
 import { LoginForm } from "./components/auth/loginForm";
+import { createUser } from "./scripts/createUser";
+
+createUser();
 export default function Home() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-pink-200 to-pink-400">
