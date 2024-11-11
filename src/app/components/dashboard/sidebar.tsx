@@ -21,6 +21,7 @@ const adminNavItems = [
   { name: "Reportes", href: "/dashboard/reports", icon: BarChart2 },
   { name: "Añadir Producto", href: "/dashboard/add-product", icon: PlusCircle },
   { name: "Configuración", href: "/dashboard/settings", icon: Settings },
+  { name: "Usuarios", href: "/dashboard/users", icon: Users },
 ];
 
 const userNavItems = [
