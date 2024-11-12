@@ -20,3 +20,11 @@ export interface LoginCredentials {
   email: string;
   password: string;
 }
+
+export interface RegisterInput {
+  email: string;
+  name: string;
+  lastName: string;
+  password: string;
+  role: "ADMIN" | "USER";
+}

@@ -25,7 +25,5 @@ export async function createUser() {
     console.log("Usuario creado exitosamente:", user);
   } catch (error) {
     console.error("Error al crear el usuario:", error);
-  } finally {
-    await prisma.$disconnect();
   }
 }

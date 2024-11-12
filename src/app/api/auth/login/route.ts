@@ -26,7 +26,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verificar la contraseña
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
@@ -36,7 +35,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // No enviar la contraseña en la respuesta
     const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json({
@@ -44,12 +42,9 @@ export async function POST(request: Request) {
       message: "Inicio de sesión exitoso",
     });
   } catch (error) {
-    console.error("Error en el inicio de sesión:", error);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { message: "Error interno del servidor", error },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
