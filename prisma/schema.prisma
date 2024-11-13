@@ -19,6 +19,8 @@ model User {
   updatedAt DateTime @updatedAt
 } 
 
+
+
 enum Role {
   ADMIN
   USER
