@@ -1,17 +1,10 @@
 "use client";
 
 import React from "react";
-import { DataTable } from "../../ui/dataTable";
+import { DataTable } from "@/app/components/ui/dataTable";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash } from "lucide-react";
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  totalPurchases: number;
-}
+import { Customer } from "@/app/lib/auth/types";
 
 const columns = [
   {

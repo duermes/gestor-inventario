@@ -1,7 +1,7 @@
 "use client";
 
-import { UserForm } from "@/app/components/dashboard/admin/userForm";
-import { UsersTable } from "@/app/components/dashboard/admin/usersTable";
+import { UserForm } from "@/app/components/dashboard/admin/users/userForm";
+import { UsersTable } from "@/app/components/dashboard/admin/users/usersTable";
 
 export default function Page() {
   return (

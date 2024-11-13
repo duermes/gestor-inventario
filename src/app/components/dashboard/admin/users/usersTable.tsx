@@ -1,24 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { DataTable } from "../../ui/dataTable";
-import { Button } from "@/components/ui/button";
-import { Edit, Trash } from "lucide-react";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  isActive: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { DataTable } from "../../../ui/dataTable";
+import { ActionButtons } from "./actionButtons";
+import { User } from "@/app/lib/auth/types";
 
 const columns = [
   {
     accessorKey: "name" as keyof User,
     header: "Nombre",
+  },
+  {
+    accessorKey: "lastName" as keyof User,
+    header: "Apellido",
   },
 
   {
@@ -52,19 +46,25 @@ const columns = [
     accessorKey: "updatedAt" as keyof User,
     header: "Actualizado",
   },
+  // {
+  //   accessorKey: "actions",
+  //   header: "Acciones",
+  //   cell: (item: User) => (
+  //     <div className="flex gap-2">
+  //       <Button variant="ghost" size="icon">
+  //         <Edit className="h-4 w-4" />
+  //       </Button>
+  //       <Button variant="ghost" size="icon">
+  //         <Trash className="h-4 w-4" />
+  //       </Button>
+  //     </div>
+  //   ),
+  // },
+
   {
     accessorKey: "actions",
     header: "Acciones",
-    cell: (item: User) => (
-      <div className="flex gap-2">
-        <Button variant="ghost" size="icon">
-          <Edit className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="icon">
-          <Trash className="h-4 w-4" />
-        </Button>
-      </div>
-    ),
+    cell: (item: User) => <ActionButtons user={item} />,
   },
 ];
 

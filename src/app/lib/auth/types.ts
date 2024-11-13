@@ -10,6 +10,14 @@ export interface User {
   updatedAt: Date;
 }
 
+export interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  totalPurchases: number;
+}
+
 export interface ValidationErrors {
   email?: string;
   password?: string;

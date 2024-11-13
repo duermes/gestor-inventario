@@ -1,5 +1,3 @@
-// obtener todos los usuarios
-
 import { RegisterInput } from "@/app/lib/auth/types";
 import prisma from "@/app/lib/db";
 import bcrypt from "bcrypt";
@@ -30,7 +28,6 @@ export async function GET() {
   }
 }
 
-// Crear un usuario
 export async function POST(request: Request) {
   const body: RegisterInput = await request.json();
   const { email, name, lastName, password, role } = body;

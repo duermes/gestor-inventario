@@ -1,4 +1,4 @@
-import { CustomersTable } from "@/app/components/dashboard/admin/customersTable";
+import { CustomersTable } from "@/app/components/dashboard/admin/users/customersTable";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 
