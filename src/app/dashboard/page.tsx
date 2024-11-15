@@ -1,17 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, DollarSign, Users, ShoppingCart } from "lucide-react";
+import { useAuth } from "../components/authProvider";
 
 export default function Page() {
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    // Aquí deberías verificar el rol del usuario
-    // Por ahora, lo simularemos con un valor hardcodeado
-    setIsAdmin(true); // Cambia a false para simular un usuario no admin
-  }, []);
+  const { user } = useAuth();
 
   return (
     <div>
@@ -39,7 +33,7 @@ export default function Page() {
             <div className="text-2xl font-bold">$500.00</div>
           </CardContent>
         </Card>
-        {isAdmin && (
+        {user?.role == "ADMIN" && (
           <>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

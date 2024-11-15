@@ -1,32 +1,41 @@
 "use client";
 
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Role, User } from "@prisma/client";
-import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
-import { Label } from "@radix-ui/react-label";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
+} from "@/components/ui/select";
 import { Edit, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Role } from "@prisma/client";
+import { User } from "@/app/lib/auth/types";
 
-export function ActionButtons({ user }: { user: User }) {
+interface ActionButtonsProps {
+  user: User;
+  onUserUpdated?: () => void;
+}
+
+export function ActionButtons({ user, onUserUpdated }: ActionButtonsProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
-  const [message, setMessage] = useState<{
-    text: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEdit = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(`/api/users/${user.id}`, {
         method: "PATCH",
         headers: {
@@ -39,17 +48,20 @@ export function ActionButtons({ user }: { user: User }) {
         throw new Error("Failed to update user");
       }
 
-      setMessage({ text: "Usuario actualizado exitosamente", type: "success" });
       setIsEditOpen(false);
-      // Aquí deberías actualizar el estado de los usuarios en el componente padre
+      if (onUserUpdated) {
+        onUserUpdated();
+      }
     } catch (error) {
       console.error("Error updating user:", error);
-      setMessage({ text: "Error al actualizar el usuario", type: "error" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDelete = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(`/api/users/${user.id}`, {
         method: "DELETE",
       });
@@ -58,23 +70,16 @@ export function ActionButtons({ user }: { user: User }) {
         throw new Error("Failed to delete user");
       }
 
-      setMessage({ text: "Usuario eliminado exitosamente", type: "success" });
       setIsDeleteOpen(false);
-      // Aquí deberías actualizar el estado de los usuarios en el componente padre
+      if (onUserUpdated) {
+        onUserUpdated();
+      }
     } catch (error) {
       console.error("Error deleting user:", error);
-      setMessage({ text: "Error al eliminar el usuario", type: "error" });
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        setMessage(null);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
 
   return (
     <>
@@ -91,72 +96,51 @@ export function ActionButtons({ user }: { user: User }) {
         </Button>
       </div>
 
-      {message && (
-        <div
-          className={`fixed bottom-4 right-4 p-4 rounded-md ${
-            message.type === "success" ? "bg-green-500" : "bg-red-500"
-          } text-white`}
-        >
-          {message.text}
-        </div>
-      )}
-
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Usuario</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Nombre
-              </Label>
-              <Input
-                id="name"
-                value={editedUser.name}
-                onChange={(e) =>
-                  setEditedUser({ ...editedUser, name: e.target.value })
-                }
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="lastName" className="text-right">
-                Apellido
-              </Label>
-              <Input
-                id="lastName"
-                value={editedUser.lastName}
-                onChange={(e) =>
-                  setEditedUser({ ...editedUser, lastName: e.target.value })
-                }
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 value={editedUser.email}
                 onChange={(e) =>
                   setEditedUser({ ...editedUser, email: e.target.value })
                 }
-                className="col-span-3"
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="role" className="text-right">
-                Rol
-              </Label>
-              <Select
-                onValueChange={(value) =>
-                  setEditedUser({ ...editedUser, role: value as Role })
+            <div className="space-y-2">
+              <Label htmlFor="name">Nombre</Label>
+              <Input
+                id="name"
+                value={editedUser.name}
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser, name: e.target.value })
                 }
-                defaultValue={editedUser.role}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Apellido</Label>
+              <Input
+                id="lastName"
+                value={editedUser.lastName}
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser, lastName: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Rol</Label>
+              <Select
+                value={editedUser.role}
+                onValueChange={(value: Role) =>
+                  setEditedUser({ ...editedUser, role: value })
+                }
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger>
                   <SelectValue placeholder="Seleccionar rol" />
                 </SelectTrigger>
                 <SelectContent>
@@ -165,17 +149,15 @@ export function ActionButtons({ user }: { user: User }) {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="isActive" className="text-right">
-                Activo
-              </Label>
+            <div className="space-y-2">
+              <Label htmlFor="isActive">Estado</Label>
               <Select
+                value={editedUser.isActive ? "true" : "false"}
                 onValueChange={(value) =>
                   setEditedUser({ ...editedUser, isActive: value === "true" })
                 }
-                defaultValue={editedUser.isActive ? "true" : "false"}
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger>
                   <SelectValue placeholder="Seleccionar estado" />
                 </SelectTrigger>
                 <SelectContent>
@@ -186,8 +168,11 @@ export function ActionButtons({ user }: { user: User }) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" onClick={handleEdit}>
-              Guardar cambios
+            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleEdit} disabled={isLoading}>
+              {isLoading ? "Guardando..." : "Guardar cambios"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -196,15 +181,24 @@ export function ActionButtons({ user }: { user: User }) {
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar eliminación</DialogTitle>
+            <DialogTitle>Eliminar Usuario</DialogTitle>
           </DialogHeader>
-          <p>¿Estás seguro de que quieres eliminar a este usuario?</p>
+          <div className="py-4">
+            <p>¿Estás seguro de que quieres eliminar a este usuario?</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Esta acción no se puede deshacer.
+            </p>
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Eliminar
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isLoading}
+            >
+              {isLoading ? "Eliminando..." : "Eliminar"}
             </Button>
           </DialogFooter>
         </DialogContent>

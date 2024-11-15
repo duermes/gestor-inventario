@@ -1,9 +1,9 @@
 export interface User {
-  id: string;
+  id?: string;
   email: string;
   name: string;
   lastName: string;
-  password: string;
+  password?: string;
   role: "ADMIN" | "USER";
   isActive: boolean;
   createdAt: Date;
@@ -34,5 +34,19 @@ export interface RegisterInput {
   name: string;
   lastName: string;
   password: string;
-  role: "ADMIN" | "USER";
+  role: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  singUp: (
+    email: string,
+    name: string,
+    lastname: string,
+    password: string,
+    role: string
+  ) => Promise<{ data: any; status: number } | undefined>;
+  loading: boolean;
 }

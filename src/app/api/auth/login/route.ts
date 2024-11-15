@@ -37,10 +37,13 @@ export async function POST(request: Request) {
 
     const { password: _, ...userWithoutPassword } = user;
 
-    return NextResponse.json({
-      user: userWithoutPassword,
-      message: "Inicio de sesión exitoso",
-    });
+    return NextResponse.json(
+      {
+        user: userWithoutPassword,
+        message: "Inicio de sesión exitoso",
+      },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { message: "Error interno del servidor", error },

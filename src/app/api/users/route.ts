@@ -19,7 +19,7 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(users);
+    return NextResponse.json(users, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: "Error al obtener usuarios", error },

@@ -20,15 +20,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UserPlus } from "lucide-react";
+import { RegisterInput } from "@/app/lib/auth/types";
 
-export function UserForm() {
+export function UserForm({
+  onUserCreated,
+  loading,
+}: {
+  onUserCreated: (userData: RegisterInput) => Promise<void>;
+  loading: boolean;
+}) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsLoading(true);
 
     const formData = new FormData(event.currentTarget);
     const data = {
@@ -40,24 +45,11 @@ export function UserForm() {
     };
 
     try {
-      const response = await fetch("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al crear usuario");
-      }
-
+      await onUserCreated(data);
       setOpen(false);
       router.refresh();
     } catch (error) {
       console.error("Error:", error);
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -129,8 +121,8 @@ export function UserForm() {
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Creando..." : "Crear Usuario"}
+            <Button type="submit" disabled={loading}>
+              {loading ? "Creando..." : "Crear Usuario"}
             </Button>
           </div>
         </form>
