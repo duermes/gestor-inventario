@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   const body: RegisterInput = await request.json();
   const { email, name, lastName, password, role } = body;
 
-  password.match(//)
+  // password.match(//);
 
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
