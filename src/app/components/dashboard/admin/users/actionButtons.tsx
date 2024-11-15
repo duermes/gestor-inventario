@@ -186,7 +186,7 @@ export function ActionButtons({ user, onUserUpdated }: ActionButtonsProps) {
           <div className="py-4">
             <p>¿Estás seguro de que quieres eliminar a este usuario?</p>
             <p className="text-sm text-muted-foreground mt-2">
-              Esta acción no se puede deshacer.
+              Esta acción es permanente y no se puede deshacer.
             </p>
           </div>
           <DialogFooter>

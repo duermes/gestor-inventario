@@ -31,6 +31,12 @@ export function UserForm({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
+
+  function resetErrors() {
+    setOpen(false);
+    setError("");
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,22 +47,27 @@ export function UserForm({
       name: formData.get("name") as string,
       lastName: formData.get("lastName") as string,
       password: formData.get("password") as string,
-      role: formData.get("role") as string,
+      role: formData.get("role") as "ADMIN" | "USER",
     };
 
     try {
-      await onUserCreated(data);
-      setOpen(false);
+      const user = await onUserCreated(data);
+      if (user.error) {
+        setError(user.error);
+        return;
+      }
+      resetErrors();
       router.refresh();
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (err) {
+      setError("Error al crear el usuario");
+      console.error("Error:", err);
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button onClick={resetErrors}>
           <UserPlus className="mr-2 h-4 w-4" />
           Nuevo Usuario
         </Button>
@@ -112,12 +123,13 @@ export function UserForm({
                 </SelectContent>
               </Select>
             </div>
+            <div className="text-red-600">{error}</div>
           </div>
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => resetErrors()}
             >
               Cancelar
             </Button>

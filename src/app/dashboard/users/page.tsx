@@ -38,7 +38,6 @@ export default function Page() {
 
   const createUser = async (userData: RegisterInput) => {
     try {
-      setLoading(true);
       const response = await fetch("/api/users", {
         method: "POST",
         headers: {
@@ -52,17 +51,19 @@ export default function Page() {
           role: userData.role,
         }),
       });
+
+      const data = await response.json();
       if (response.status == 201) {
+        setLoading(true);
         await getUsers();
         setLoading(false);
-        return response.json();
+        return data;
       } else {
-        console.error("Error al crear el usuario", response.statusText);
-        setLoading(false);
+        return { error: data.error };
       }
     } catch (error) {
-      console.error("Error al crear el usuario:", error);
       setLoading(false);
+      return { error: "Error al crear el usuario" };
     }
   };
   return (
