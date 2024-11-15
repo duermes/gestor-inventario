@@ -34,7 +34,7 @@ export interface RegisterInput {
   name: string;
   lastName: string;
   password: string;
-  role: string;
+  role: "ADMIN" | "USER";
 }
 
 export interface AuthContextType {

@@ -62,7 +62,7 @@ export function ActionButtons({ user, onUserUpdated }: ActionButtonsProps) {
   const handleDelete = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/users/${user.id}`, {
+      const response = await fetch(`/api/users/${user.id}?delete=true`, {
         method: "DELETE",
       });
 

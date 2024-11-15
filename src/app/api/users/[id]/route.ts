@@ -1,5 +1,5 @@
 import prisma from "@/app/lib/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
@@ -51,20 +51,31 @@ export async function DELETE(
   context: { params: { id: string } }
 ) {
   const { params } = context;
+  const id = params.id;
+  const { searchParams } = new URL(request.url);
+  const toDelete = searchParams.get("delete");
+  if (toDelete === "true") {
+    try {
+      await prisma.user.delete({
+        where: { id },
+      });
 
-  try {
-    await prisma.user.update({
-      where: { id: params.id },
-      data: { isActive: false },
-    });
-
-    return NextResponse.json({
-      message: "Usuario eliminado exitosamente",
-    });
-  } catch (error) {
+      return NextResponse.json(
+        {
+          message: "Usuario eliminado exitosamente",
+        },
+        { status: 200 }
+      );
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Error al eliminar usuario" },
+        { status: 500 }
+      );
+    }
+  } else {
     return NextResponse.json(
-      { message: "Error al eliminar usuario", error },
-      { status: 500 }
+      { error: "Borrar el usuario no es true" },
+      { status: 400 }
     );
   }
 }
@@ -97,8 +108,8 @@ export async function PATCH(
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error, message: "Error al actualizar usario." },
-      { status: 500 }
+      { error: "Error al actualizar datos en el usuario" },
+      { status: 400 }
     );
   }
 }
