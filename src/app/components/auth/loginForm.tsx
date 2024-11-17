@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LoginCredentials, ValidationErrors } from "@/app/lib/auth/types";
+import { LoginCredentials } from "@/app/lib/auth/types";
 import { useAuth } from "../authProvider";
 
 export const LoginForm = () => {
@@ -11,21 +11,23 @@ export const LoginForm = () => {
     email: "",
     password: "",
   });
-  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [errors, setErrors] = useState("");
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrors({});
+    setErrors("");
     try {
-      await login(credentials.email, credentials.password);
+      const res = await login(credentials.email, credentials.password);
+      if (res) {
+        setErrors(res);
+      }
     } catch (error) {
-      console.error("Login error:", error);
-      setErrors({
-        general: "Credenciales inválidas. Por favor, intenta de nuevo.",
-      });
+      setErrors(
+        error instanceof Error ? error.message : "Error al iniciar sesión"
+      );
     }
   };
 
@@ -45,14 +47,11 @@ export const LoginForm = () => {
           value={credentials.email}
           onChange={handleChange}
           className={`w-full px-3 py-2 border ${
-            errors.email ? "border-red-500" : "border-gray-300"
+            errors ? "border-red-500" : "border-gray-300"
           } rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500`}
           required
           disabled={loading}
         />
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-500">{errors.email}</p>
-        )}
       </div>
       <div>
         <label
@@ -68,18 +67,13 @@ export const LoginForm = () => {
           value={credentials.password}
           onChange={handleChange}
           className={`w-full px-3 py-2 border ${
-            errors.password ? "border-red-500" : "border-gray-300"
+            errors ? "border-red-500" : "border-gray-300"
           } rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500`}
           required
           disabled={loading}
         />
-        {errors.password && (
-          <p className="mt-1 text-sm text-red-500">{errors.password}</p>
-        )}
       </div>
-      {errors.general && (
-        <div className="text-sm text-red-500 text-center">{errors.general}</div>
-      )}
+      <div className="text-sm text-red-500">{errors}</div>
       <button
         type="submit"
         className="w-full bg-gradient-to-r from-pink-400 to-pink-600 text-white py-2 rounded-md hover:from-pink-500 hover:to-pink-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"

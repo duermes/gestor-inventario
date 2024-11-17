@@ -21,8 +21,8 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "Credenciales inválidas (usuario no encontrado)" },
-        { status: 401 }
+        { error: "Credenciales inválidas" },
+        { status: 400 }
       );
     }
 
@@ -30,8 +30,8 @@ export async function POST(request: Request) {
 
     if (!passwordMatch) {
       return NextResponse.json(
-        { error: "Contraseña inválidas" },
-        { status: 401 }
+        { error: "Contraseña inválida" },
+        { status: 400 }
       );
     }
 
@@ -46,7 +46,10 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Error interno del servidor", error },
+      {
+        error:
+          "Error interno del servidor, por favor contactar con un administrador",
+      },
       { status: 500 }
     );
   }

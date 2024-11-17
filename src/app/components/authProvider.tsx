@@ -15,39 +15,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   const login = async (email: string, password: string) => {
-    setLoading(true);
-    await fetch(`/api/auth/login`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    }).then(async (res) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/auth/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setLoading(false);
+        return data.error;
+      }
+
       if (res.status == 200) {
-        const data = await res.json();
         const { user } = data;
         setUser(user);
         setLoading(false);
         router.push("/dashboard");
       }
-    });
+    } catch (error) {
+      return error;
+    }
   };
 
   const logout = async () => {
-    await fetch(`api/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    }).then(async (res) => {
-      if (res.status == 200) {
-        router.push("/");
-        setUser(null);
-        setLoading(false);
-      }
-    });
+    // await fetch(`api/auth/logout`, {
+    //   method: "POST",
+    //   credentials: "include",
+    // }).then(async (res) => {
+    //   if (res.status == 200) {
+    //     router.push("/");
+    //     setUser(null);
+    //     setLoading(false);
+    //   }
+    // });
+    router.push("/");
+    setUser(null);
+    setLoading(false);
   };
 
   const singUp = async (
@@ -121,24 +132,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //   });
   // };
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     const fetchUserData = async () => {
-  //       await fetch(`${process.env.NEXT_PUBLIC_API}/users/profile`, {
-  //         method: "GET",
-  //         credentials: "include",
-  //       })
-  //         .then(async (res) => {
-  //           if (res.status == 200) {
-  //             const data = await res.json();
-  //             setUser(data);
-  //           }
-  //         })
-  //         .finally(() => setLoading(false));
-  //     };
-  //     fetchUserData();
-  //   }
-  // }, [user]);
+  useEffect(() => {
+    // if (!user) {
+    //   const fetchUserData = async () => {
+    //     await fetch(`${process.env.NEXT_PUBLIC_API}/users/profile`, {
+    //       method: "GET",
+    //       credentials: "include",
+    //     })
+    //       .then(async (res) => {
+    //         if (res.status == 200) {
+    //           const data = await res.json();
+    //           setUser(data);
+    //         }
+    //       })
+    //       .finally(() => setLoading(false));
+    //   };
+    //   fetchUserData();
+    // }
+    if (!user) {
+      router.push("/");
+    }
+  }, [user]);
 
   return (
     <AuthContext.Provider

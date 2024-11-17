@@ -13,6 +13,7 @@ import {
   PlusCircle,
   LogOut,
 } from "lucide-react";
+import { useAuth } from "../authProvider";
 
 const adminNavItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -22,24 +23,35 @@ const adminNavItems = [
   { name: "Añadir Producto", href: "/dashboard/add-product", icon: PlusCircle },
   { name: "Configuración", href: "/dashboard/settings", icon: Settings },
   { name: "Usuarios", href: "/dashboard/users", icon: Users },
+  { name: "Generar Venta", href: "/dashboard/create-sale", icon: ShoppingCart },
 ];
 
 const userNavItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Inventario", href: "/dashboard/inventory", icon: Package },
   { name: "Generar Venta", href: "/dashboard/create-sale", icon: ShoppingCart },
+  { name: "Configuración", href: "/dashboard/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
+  const { user, logout } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    // Aquí se debe de verificar si es ADMIN o USUARIO
-    setIsAdmin(true); // Ejemplo, forzado admin
-  }, []);
+    if (user?.role === "ADMIN") {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  }, [isAdmin]);
 
   const navItems = isAdmin ? adminNavItems : userNavItems;
+
+  const handleLogout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    await logout();
+  };
 
   return (
     <div className="flex flex-col w-64 bg-white shadow-lg">
@@ -65,8 +77,9 @@ export default function Sidebar() {
       </nav>
       <div className="p-4">
         <Link
-          href="/logout"
+          href=""
           className="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+          onClick={handleLogout}
         >
           <LogOut className="h-5 w-5 mr-3" />
           Cerrar sesión
