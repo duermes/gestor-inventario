@@ -96,6 +96,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const changePassword = async (password: string, newPassword: string) => {
+    if (!user) {
+      return { error: "No hay ningun usuario logueado" };
+    }
+    try {
+      setLoading(true);
+
+      const res = await fetch(`/api/users/${user.id}/password`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password, newPassword }),
+      });
+      const data = await res.json();
+      if (res.status == 200) {
+        setLoading(false);
+        return data.message;
+      }
+
+      if (data.error) {
+        setLoading(false);
+        return data.error;
+      }
+    } catch (error) {
+      setLoading(false);
+      return "Error al cambiar la contraseña";
+    }
+  };
+
   // const requestReset = async (email: string, token: string) => {
   //   await fetch(`${process.env.NEXT_PUBLIC_API}/auth/resetPassword/request`, {
   //     method: "POST",
@@ -162,6 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         singUp,
         loading,
+        changePassword,
       }}
     >
       {children}

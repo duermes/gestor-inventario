@@ -49,4 +49,5 @@ export interface AuthContextType {
     role: string
   ) => Promise<{ data: any; status: number } | undefined>;
   loading: boolean;
+  changePassword: (password: string, newPassword: string) => Promise<any>;
 }

@@ -79,7 +79,7 @@ export async function DELETE(
     );
   }
 }
-
+// verificar el updatedAt se actualice correctamente aqui
 export async function PATCH(
   request: Request,
   context: { params: { id: string } }

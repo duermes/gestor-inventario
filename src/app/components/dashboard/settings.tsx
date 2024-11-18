@@ -1,6 +1,6 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Lock, Mail, User } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 
 import {
   Card,
@@ -9,15 +9,49 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@radix-ui/react-label";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useAuth } from "../authProvider";
 
 export default function Settings() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const { changePassword, loading } = useAuth();
+  const [formData, setFormData] = useState({
+    password: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [message, setMessage] = useState("");
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Las contraseñas nuevas no coinciden",
+      });
+      return;
+    }
+
+    try {
+      const res = await changePassword(formData.password, formData.newPassword);
+      setMessage(res);
+    } catch (error) {
+      setMessage("Error al crear usuario");
+    }
+  };
 
   return (
     <Tabs defaultValue="password" className="space-y-4">
@@ -40,15 +74,15 @@ export default function Settings() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Contraseña Actual</Label>
+                <Label htmlFor="password">Contraseña Actual</Label>
                 <Input
-                  id="currentPassword"
-                  name="currentPassword"
+                  id="password"
+                  name="password"
                   type="password"
-                  //   value={passwordData.currentPassword}
-                  //   onChange={handlePasswordChange}
+                  value={formData.password}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -58,8 +92,8 @@ export default function Settings() {
                   id="newPassword"
                   name="newPassword"
                   type="password"
-                  //   value={passwordData.newPassword}
-                  //   onChange={handlePasswordChange}
+                  value={formData.newPassword}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -71,14 +105,17 @@ export default function Settings() {
                   id="confirmPassword"
                   name="confirmPassword"
                   type="password"
-                  //   value={passwordData.confirmPassword}
-                  //   onChange={handlePasswordChange}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
                   required
                 />
               </div>
               <Button type="submit" disabled={loading}>
                 {loading ? "Actualizando..." : "Actualizar Contraseña"}
               </Button>
+              {message && (
+                <p className="text-sm text-muted-foreground">{message}</p>
+              )}
             </form>
           </CardContent>
         </Card>
@@ -96,14 +133,7 @@ export default function Settings() {
             <form className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="newEmail">Nuevo Correo Electrónico</Label>
-                <Input
-                  id="newEmail"
-                  name="newEmail"
-                  type="email"
-                  //   value={emailData.newEmail}
-                  //   onChange={handleEmailChange}
-                  required
-                />
+                <Input id="newEmail" name="newEmail" type="email" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="emailPassword">Confirmar Contraseña</Label>
@@ -111,8 +141,6 @@ export default function Settings() {
                   id="emailPassword"
                   name="password"
                   type="password"
-                  //   value={emailData.password}
-                  //   onChange={handleEmailChange}
                   required
                 />
               </div>
