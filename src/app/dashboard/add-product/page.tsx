@@ -59,6 +59,8 @@ export default function AddProductPage() {
       stock: formData.get("stock") as number,
       imageUrl: formData.get("imageUrl") as string,
     };
+    await createProduct(data);
+
   }
 
   return (
@@ -135,7 +137,7 @@ export default function AddProductPage() {
             <div className="grid gap-2">
               <Label htmlFor="size">Talla</Label>
               <Input
-                id="stock"
+                id="size"
                 type="string"
                 placeholder="0"
                 value="estandar"
@@ -165,6 +167,7 @@ export default function AddProductPage() {
             {loading ? "Guardando..." : "Guardar Producto"}
           </Button>
         </CardFooter>
+        <div className="text-red-500" value={error}></div>
       </Card>
     </div>
   );
