@@ -3,9 +3,62 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, DollarSign, Users, ShoppingCart } from "lucide-react";
 import { useAuth } from "../components/authProvider";
+import { useCallback, useEffect, useState } from "react";
 
 export default function Page() {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+
+  const getProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/products", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === 200) {
+        const data = await response.json();
+        setProducts(data);
+        return data;
+      } else {
+        console.error("Error al cargar los productos");
+      }
+    } catch (error) {
+      console.error("Error al cargar los productos:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    getProducts();
+  }, [getProducts]);
+
+  const updateProduct = async (productData) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/products/${productData.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(productData),
+      });
+      const data = await res.json();
+      if (res.status === 200) {
+        await getProducts();
+        return data;
+      }
+      return { error: data.error };
+    } catch (error) {
+      return { error: "Error al actualizar producto" };
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>

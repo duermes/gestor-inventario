@@ -17,11 +17,109 @@ model User {
   isActive Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  logs    Logs[]
+  sale   Sale[]
+
 } 
-
-
 
 enum Role {
   ADMIN
   USER
 }
+
+
+enum ProductCategory {
+  BODY
+  BLUSA
+  POLO
+  TOP
+  VESTIDO
+  ENTERIZO
+}
+
+enum MaterialType {
+  SUPLEX
+  VIENA
+  RIP_GRUESO
+  OTROS
+  HILO
+  SCUBA
+  CUERINA
+  BABY_RIP
+  ALGODON_JERSEY
+  SEDA
+  SHANEL
+  WAFER
+  CHALIS
+  SLINKY
+  SEDA_FRANCESA
+  LINO
+  PRADA
+  CATANIA
+  ASTURIA
+}
+
+enum Actions {
+  INVENTARIO
+  NUEVO_PRODUCTO
+  ELIMINAR_PRODUCTO
+  ACTUALIZAR_PRODUCTO
+  USUARIO
+  NUEVO_USUARIO
+  ELIMINAR_USUARIO
+  ACTUALIZAR_USUARIO
+
+}
+
+model Logs {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  category    ProductCategory
+  material    MaterialType
+  size        String          @default("estandar")
+  color       String @default("colores comerciales")
+  price       Float
+  stock       Int            @default(0)
+  imageUrl    String?
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  saleItems   SaleItem[]     
+}
+
+model SaleItem {
+  id        String   @id @default(cuid())
+  saleId    String   // ID de la venta
+  sale      Sale     @relation(fields: [saleId], references: [id])
+  productId String   // ID del producto
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      // Cantidad vendida
+  price     Float    // Precio al momento de la venta
+  subtotal  Float    // Subtotal (precio * cantidad)
+  createdAt DateTime @default(now())
+
+  @@index([saleId])
+  @@index([productId])
+}
+
+model Sale {
+  id          String     @id @default(cuid())
+  userId      String     // ID del usuario que generó la venta
+  user        User       @relation(fields: [userId], references: [id])
+  items       SaleItem[] // Los productos incluidos en la venta
+  total       Float      // Total de la venta
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+
+

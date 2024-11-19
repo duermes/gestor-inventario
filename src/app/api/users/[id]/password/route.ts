@@ -1,7 +1,6 @@
 import prisma from "@/app/lib/db";
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-// to change password
 export async function PATCH(
   request: Request,
   context: { params: { id: string } }
@@ -64,8 +63,6 @@ export async function PATCH(
         { status: 400 }
       );
     }
-
-    // algo esta mal aqui NO SE QUE ESTA MAL PERO ALGO ESTA MAL
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     console.log(`isValidPassword: ${isValidPassword}`);

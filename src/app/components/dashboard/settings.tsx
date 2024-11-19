@@ -59,10 +59,10 @@ export default function Settings() {
         <TabsTrigger value="password" className="flex items-center gap-2">
           <Lock className="h-4 w-4" /> Contraseña
         </TabsTrigger>
-        <TabsTrigger value="email" className="flex items-center gap-2">
+        {/* <TabsTrigger value="email" className="flex items-center gap-2">
           <Mail className="h-4 w-4" />
           Correo Electrónico
-        </TabsTrigger>
+        </TabsTrigger> */}
       </TabsList>
 
       <TabsContent value="password">
@@ -120,7 +120,7 @@ export default function Settings() {
           </CardContent>
         </Card>
       </TabsContent>
-
+      {/* 
       <TabsContent value="email">
         <Card>
           <CardHeader>
@@ -150,7 +150,7 @@ export default function Settings() {
             </form>
           </CardContent>
         </Card>
-      </TabsContent>
+      </TabsContent> */}
     </Tabs>
   );
 }
