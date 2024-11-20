@@ -12,12 +12,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useAuth } from "../authProvider";
 
 export default function Settings() {
-  const { toast } = useToast();
   const { changePassword, loading } = useAuth();
   const [formData, setFormData] = useState({
     password: "",
@@ -37,11 +35,7 @@ export default function Settings() {
     e.preventDefault();
 
     if (formData.newPassword !== formData.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Las contraseñas nuevas no coinciden",
-      });
+      setMessage("Las contraseñas no coinciden");
       return;
     }
 

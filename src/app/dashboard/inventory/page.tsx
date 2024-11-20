@@ -12,6 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Edit, Trash } from "lucide-react";
+import { useAuth } from "@/app/components/authProvider";
+import { ProductsTable } from "@/app/components/dashboard/inventory/productsTable";
 
 // Aqui se deberia de cargar los datos del inventario
 const inventoryData = [
@@ -21,18 +23,14 @@ const inventoryData = [
 ];
 
 export default function InventoryPage() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [inventory, setInventory] = useState(inventoryData);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // verificar rol del usuario
-    setIsAdmin(true);
-  }, []);
-
-  const filteredInventory = inventory.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredInventory = inventory.filter((item) =>
+  //   item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   return (
     <div>
@@ -47,16 +45,21 @@ export default function InventoryPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        {isAdmin && <Button>Añadir Producto</Button>}
       </div>
-      <Table>
+      {/* <ProductsTable
+        inventory={inventory}
+        user={user}
+        loading={loading}
+        searchTerm={searchTerm}
+      /> */}
+      {/* <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Nombre</TableHead>
             <TableHead>Categoría</TableHead>
             <TableHead>Precio</TableHead>
             <TableHead>Stock</TableHead>
-            {isAdmin && <TableHead>Acciones</TableHead>}
+            {user.role == "ADMIN" && <TableHead>Acciones</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -66,7 +69,7 @@ export default function InventoryPage() {
               <TableCell>{item.category}</TableCell>
               <TableCell>${item.price.toFixed(2)}</TableCell>
               <TableCell>{item.stock}</TableCell>
-              {isAdmin && (
+              {user.role == "ADMIN" && (
                 <TableCell>
                   <Button variant="ghost" size="icon">
                     <Edit className="h-4 w-4" />
@@ -79,7 +82,7 @@ export default function InventoryPage() {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </Table> */}
     </div>
   );
 }

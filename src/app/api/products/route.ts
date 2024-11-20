@@ -26,18 +26,21 @@ export async function POST(req: Request) {
     imageUrl,
     stock,
   } = body;
-  if (!name || !category || !material || !size || !color || !price) {
+  if (!name || !category || !material || !size || !color || !price || !stock) {
     return NextResponse.json(
       {
         error:
-          "Faltan campos requeridos (nombre, categoria, material, talla, color, precio)",
+          "Faltan campos requeridos (nombre, categoria, material, talla, color, precio, stock).",
       },
       { status: 400 }
     );
   }
-  if (price <= 0) {
+  if (price <= 0 || stock < 0) {
     return NextResponse.json(
-      { error: "El precio debe ser mayor a 0" },
+      {
+        error:
+          "El precio no puede ser igual o menor a 0 y el stock no puede ser menor a 0.",
+      },
       { status: 400 }
     );
   }
@@ -50,13 +53,15 @@ export async function POST(req: Request) {
         material,
         size,
         color,
-        price,
-        ...(stock && { stock }),
+        price: parseFloat(price),
+        ...(stock && { stock: parseInt(stock) }),
+
         ...(imageUrl && { imageUrl }),
       },
     });
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Error al crear producto" },
       { status: 500 }
