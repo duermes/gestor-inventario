@@ -66,7 +66,7 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
       );
     }
 
-    if (name.length > 12) {
+    if (name.length > 20) {
       return NextResponse.json(
         {
           error: "El nombre no puede tener más de 20 caracteres.",
