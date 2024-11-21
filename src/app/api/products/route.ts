@@ -36,10 +36,19 @@ export async function POST(req: Request) {
     );
   }
 
+  if (name.length > 12) {
+    return NextResponse.json(
+      {
+        error: "El nombre no puede tener más de 20 caracteres.",
+      },
+      { status: 400 }
+    );
+  }
+
   if (size.length > 10) {
     return NextResponse.json(
       {
-        error: "La talla no puede tener más de 1 caracter.",
+        error: "La talla no puede tener más de 10 caracter.",
       },
       { status: 400 }
     );

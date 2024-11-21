@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { TableCell } from "@/components/ui/table";
-import { ProductCategory } from "@prisma/client";
+import { MaterialType, ProductCategory } from "@prisma/client";
 import { Label } from "@radix-ui/react-label";
 import {
   Select,
@@ -19,7 +19,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
+} from "@/components/ui/select";
 import { Edit, Trash } from "lucide-react";
 import React, { useState } from "react";
 
@@ -38,6 +38,7 @@ export function ActionButtons({
 
   const handleEdit = async () => {
     setIsLoading(true);
+    setError("");
     try {
       const response = await fetch(`/api/products/${product.id}`, {
         method: "PATCH",
@@ -49,14 +50,15 @@ export function ActionButtons({
 
       const data = await response.json();
       if (!response.ok) {
-        setError(data.error);
+        return setError(data.error);
       }
-      setIsEditOpen(false);
+
       if (onProductUpdate) {
+        setIsEditOpen(false);
         onProductUpdate();
       }
     } catch (error) {
-      setError("Ha ocurrido un error actualizando el usuario.");
+      setError("Ha ocurrido un error actualizando el producto.");
     } finally {
       setIsLoading(false);
     }
@@ -97,8 +99,14 @@ export function ActionButtons({
         </Button>
       </TableCell>
 
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent>
+      <Dialog
+        open={isEditOpen}
+        onOpenChange={(open) => {
+          setIsEditOpen(open);
+          if (!open) setError("");
+        }}
+      >
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Producto</DialogTitle>
           </DialogHeader>
@@ -127,7 +135,21 @@ export function ActionButtons({
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="size">Talla</Label>
+              <Input
+                id="size"
+                value={editedProduct.size || ""}
+                onChange={(e) =>
+                  setEditedProduct({
+                    ...editedProduct,
+                    size: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="category">Categoría</Label>
+
               <Select
                 value={editedProduct.category}
                 onValueChange={(value: ProductCategory) =>
@@ -138,12 +160,11 @@ export function ActionButtons({
                   <SelectValue placeholder="Seleccionar categoría" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="BODY">Body</SelectItem>
-                  <SelectItem value="BLUSA">Blusa</SelectItem>
-                  <SelectItem value="POLO">Polo</SelectItem>
-                  <SelectItem value="TOP">Top</SelectItem>
-                  <SelectItem value="VESTIDO">Vestido</SelectItem>
-                  <SelectItem value="ENTERIZO">Enterizo</SelectItem>
+                  {Object.values(ProductCategory).map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -159,15 +180,11 @@ export function ActionButtons({
                   <SelectValue placeholder="Seleccionar material" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="OTROS">Otros</SelectItem>
-                  <SelectItem value="SUPLEX">Suplex</SelectItem>
-                  <SelectItem value="VIENA">Viena</SelectItem>
-                  <SelectItem value="HILO">Hilo</SelectItem>
-                  <SelectItem value="SCUBA">Scuba</SelectItem>
-                  <SelectItem value="CUERINA">Cuerina</SelectItem>
-                  <SelectItem value="RIP_GRUESO">Rip Grueso</SelectItem>
-                  <SelectItem value="BABY_RIP">Baby Rip</SelectItem>
-                  <SelectItem value="ALGODON_JERSEY">Algodón Jersey</SelectItem>
+                  {Object.values(MaterialType).map((material) => (
+                    <SelectItem key={material} value={material}>
+                      {material}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -220,7 +237,7 @@ export function ActionButtons({
               </Select>
             </div>
           </div>
-          {error && <div className="text-sm text-red-500 mt-2">{error}</div>}
+          {error && <div className="text-sm text-red-500">{error}</div>}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditOpen(false)}>
               Cancelar
@@ -232,8 +249,14 @@ export function ActionButtons({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent>
+      <Dialog
+        open={isDeleteOpen}
+        onOpenChange={(open) => {
+          setIsDeleteOpen(open);
+          if (!open) setError("");
+        }}
+      >
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Eliminar Producto</DialogTitle>
           </DialogHeader>

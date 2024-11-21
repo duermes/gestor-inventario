@@ -68,10 +68,6 @@ export default function InventoryPage() {
     return <div className="text-center py-4">Cargando inventario...</div>;
   }
 
-  if (user.role !== "ADMIN") {
-    return <div>No tienes permisos para ver esta página</div>;
-  }
-
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Inventario</h1>
