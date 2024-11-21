@@ -1,5 +1,184 @@
+import prisma from "@/app/lib/db";
+import { NextResponse } from "next/server";
+
 export async function GET(req: Request, context: { params: { id: string } }) {
   const { params } = context;
-  try {
-  } catch (error) {}
+  await prisma.product
+    .findUnique({
+      where: { id: params.id },
+    })
+    .then((res) => {
+      if (!res) {
+        return NextResponse.json(
+          {
+            error: "Producto no encontrado.",
+          },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(
+        {
+          res,
+        },
+        { status: 200 }
+      );
+    })
+    .catch(() => {
+      return NextResponse.json(
+        {
+          error: "Ha ocurrido un error encontrando el producto",
+        },
+        { status: 500 }
+      );
+    });
 }
+
+export async function PATCH(req: Request, context: { params: { id: string } }) {
+  try {
+    const { params } = context;
+    const body = await req.json();
+    const { name, description, category, material, size, color, price, stock } =
+      body;
+    if (
+      !name ||
+      !category ||
+      !material ||
+      !size ||
+      !color ||
+      !price ||
+      !stock
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Faltan campos requeridos (nombre, categoria, material, talla, color, precio, stock).",
+        },
+        { status: 400 }
+      );
+    }
+    if (price <= 0 || stock < 0) {
+      return NextResponse.json(
+        {
+          error:
+            "El precio no puede ser igual o menor a 0 y el stock no puede ser menor a 0.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (size.length > 10) {
+      return NextResponse.json(
+        {
+          error: "La talla no puede tener más de 1 caracter.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (description && description.length > 10) {
+      return NextResponse.json(
+        {
+          error: "La descripción no puede tener más de 10 caracteres.",
+        },
+        { status: 400 }
+      );
+    }
+
+    return prisma.product
+      .update({
+        where: { id: params.id },
+        data: body,
+      })
+      .then(() => {
+        return NextResponse.json(
+          {
+            message: "Producto actualizado exitosamente.",
+          },
+          { status: 200 }
+        );
+      })
+      .catch(() => {
+        return NextResponse.json(
+          {
+            error: "Error al actualizar producto",
+          },
+          { status: 500 }
+        );
+      });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Error al actualizar producto" },
+      { status: 400 }
+    );
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  context: { params: { id: string } }
+) {
+  const { params } = context;
+  const { searchParams } = new URL(req.url);
+  const toDelete = searchParams.get("delete");
+
+  if (toDelete !== "true") {
+    return NextResponse.json(
+      { error: "El parámetro 'delete' debe ser 'true'." },
+      { status: 400 }
+    );
+  }
+  return prisma.product
+    .delete({
+      where: { id: params.id },
+    })
+    .then(() => {
+      return NextResponse.json(
+        {
+          message: "Usuario eliminado exitosamente.",
+        },
+        { status: 200 }
+      );
+    })
+    .catch((err) => {
+      return NextResponse.json(
+        {
+          error: "Error al eliminar usuario",
+        },
+        { status: 500 }
+      );
+    });
+}
+
+// export async function DELETE(
+//   req: Request,
+//   context: { params: { id: string } }
+// ) {
+//   try {
+//     const { params } = context;
+//     const { searchParams } = new URL(req.url);
+//     const toDelete = searchParams.get("delete");
+
+// if (toDelete !== "true") {
+//   return NextResponse.json(
+//     { error: "El parámetro 'delete' debe ser 'true'." },
+//     { status: 400 }
+//   );
+// }
+
+//     await prisma.product.delete({
+//       where: { id: params.id },
+//     });
+
+//     return NextResponse.json(
+//       { message: "Producto eliminado exitosamente." },
+//       { status: 200 }
+//     );
+//   } catch (error) {
+//     console.error("Error al eliminar el producto:", error);
+
+//     return NextResponse.json(
+//       { error: "Ocurrió un error al eliminar el producto." },
+//       { status: 500 }
+//     );
+//   }
+// }

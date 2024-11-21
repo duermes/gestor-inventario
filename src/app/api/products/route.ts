@@ -15,17 +15,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const {
-    name,
-    description,
-    category,
-    material,
-    size,
-    color,
-    price,
-    imageUrl,
-    stock,
-  } = body;
+  const { name, description, category, material, size, color, price, stock } =
+    body;
   if (!name || !category || !material || !size || !color || !price || !stock) {
     return NextResponse.json(
       {
@@ -44,6 +35,24 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+
+  if (size.length > 10) {
+    return NextResponse.json(
+      {
+        error: "La talla no puede tener más de 1 caracter.",
+      },
+      { status: 400 }
+    );
+  }
+
+  if (description && description.length > 10) {
+    return NextResponse.json(
+      {
+        error: "La descripción no puede tener más de 10 caracteres.",
+      },
+      { status: 400 }
+    );
+  }
   try {
     const product = await prisma.product.create({
       data: {
@@ -55,8 +64,6 @@ export async function POST(req: Request) {
         color,
         price: parseFloat(price),
         ...(stock && { stock: parseInt(stock) }),
-
-        ...(imageUrl && { imageUrl }),
       },
     });
     return NextResponse.json(product, { status: 200 });

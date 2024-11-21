@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -13,24 +13,64 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Edit, Trash } from "lucide-react";
 import { useAuth } from "@/app/components/authProvider";
-import { ProductsTable } from "@/app/components/dashboard/inventory/productsTable";
-
-// Aqui se deberia de cargar los datos del inventario
-const inventoryData = [
-  { id: 1, name: "Camiseta", category: "Ropa", price: 19.99, stock: 100 },
-  { id: 2, name: "Pantalón", category: "Ropa", price: 39.99, stock: 50 },
-  { id: 3, name: "Zapatos", category: "Calzado", price: 59.99, stock: 30 },
-];
+import { ProductData } from "@/app/lib/auth/types";
+import { ActionButtons } from "@/app/components/dashboard/inventory/actionButtons";
 
 export default function InventoryPage() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-  const [inventory, setInventory] = useState(inventoryData);
+  const [inventory, setInventory] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // const filteredInventory = inventory.filter((item) =>
-  //   item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
+  const getInventory = useCallback(async () => {
+    setLoading(true);
+    await fetch("/api/products", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        const filteredData =
+          user?.role === "ADMIN"
+            ? data
+            : data.filter((item: ProductData) => item.isActive);
+        if (res.status === 200) {
+          setInventory(filteredData);
+        } else {
+          setError(data.error);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    getInventory();
+  }, [getInventory]);
+
+  const filteredInventory = inventory.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.material.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (!user) {
+    return <div>Debes de iniciar sesión para poder ver esta página.</div>;
+  }
+
+  if (loading) {
+    return <div className="text-center py-4">Cargando inventario...</div>;
+  }
+
+  if (user.role !== "ADMIN") {
+    return <div>No tienes permisos para ver esta página</div>;
+  }
 
   return (
     <div>
@@ -46,43 +86,50 @@ export default function InventoryPage() {
           />
         </div>
       </div>
-      {/* <ProductsTable
-        inventory={inventory}
-        user={user}
-        loading={loading}
-        searchTerm={searchTerm}
-      /> */}
-      {/* <Table>
+      <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Id</TableHead>
             <TableHead>Nombre</TableHead>
             <TableHead>Categoría</TableHead>
             <TableHead>Precio</TableHead>
             <TableHead>Stock</TableHead>
+            <TableHead>Material</TableHead>
+            <TableHead>Color</TableHead>
+            <TableHead>Talla</TableHead>
+            <TableHead>Descripcion</TableHead>
+            {user.role == "ADMIN" && <TableHead>Estado</TableHead>}
+
             {user.role == "ADMIN" && <TableHead>Acciones</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredInventory.map((item) => (
             <TableRow key={item.id}>
+              <TableCell>{item.id}</TableCell>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.category}</TableCell>
-              <TableCell>${item.price.toFixed(2)}</TableCell>
+              <TableCell>S/ {item.price}</TableCell>
               <TableCell>{item.stock}</TableCell>
+              <TableCell>{item.material}</TableCell>
+              <TableCell>{item.color}</TableCell>
+              <TableCell>{item.size}</TableCell>
+              <TableCell>{item.description}</TableCell>
               {user.role == "ADMIN" && (
-                <TableCell>
-                  <Button variant="ghost" size="icon">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Trash className="h-4 w-4" />
-                  </Button>
+                <TableCell
+                  className={item.isActive ? "text-green-600" : "text-red-600"}
+                >
+                  {item.isActive ? "Activo" : "Inactivo"}
                 </TableCell>
+              )}
+
+              {user.role == "ADMIN" && (
+                <ActionButtons product={item} onProductUpdate={getInventory} />
               )}
             </TableRow>
           ))}
         </TableBody>
-      </Table> */}
+      </Table>
     </div>
   );
 }

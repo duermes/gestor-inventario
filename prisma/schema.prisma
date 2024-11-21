@@ -89,7 +89,6 @@ model Product {
   color       String @default("colores comerciales")
   price       Float
   stock       Int            @default(0)
-  imageUrl    String?
   isActive    Boolean         @default(true)
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt

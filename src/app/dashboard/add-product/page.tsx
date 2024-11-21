@@ -19,18 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface ProductData {
-  name: string;
-  description: string;
-  category: string;
-  material: string;
-  size: string;
-  color: string;
-  price: string;
-  stock: string;
-  imageUrl: string;
-}
+import { ProductData } from "@/app/lib/auth/types";
 
 export default function AddProductPage() {
   const [loading, setLoading] = useState(false);

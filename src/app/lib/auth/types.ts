@@ -51,3 +51,16 @@ export interface AuthContextType {
   loading: boolean;
   changePassword: (password: string, newPassword: string) => Promise<any>;
 }
+
+export interface ProductData {
+  id?: string;
+  name: string;
+  description: string;
+  category: string;
+  material: string;
+  size: string;
+  color: string;
+  price: string;
+  stock: string;
+  isActive?: boolean;
+}

@@ -62,19 +62,19 @@ export async function DELETE(
 
       return NextResponse.json(
         {
-          message: "Usuario eliminado exitosamente",
+          message: "Usuario eliminado exitosamente.",
         },
         { status: 200 }
       );
     } catch (error) {
       return NextResponse.json(
-        { error: "Error al eliminar usuario" },
+        { error: "Error al eliminar usuario." },
         { status: 500 }
       );
     }
   } else {
     return NextResponse.json(
-      { error: "Borrar el usuario no es true" },
+      { error: "Borrar el usuario no es true." },
       { status: 400 }
     );
   }
