@@ -110,6 +110,7 @@ export function ActionButtons({ user, onUserUpdated }: ActionButtonsProps) {
                 onChange={(e) =>
                   setEditedUser({ ...editedUser, email: e.target.value })
                 }
+                disabled
               />
             </div>
             <div className="space-y-2">
@@ -120,6 +121,7 @@ export function ActionButtons({ user, onUserUpdated }: ActionButtonsProps) {
                 onChange={(e) =>
                   setEditedUser({ ...editedUser, name: e.target.value })
                 }
+                disabled
               />
             </div>
             <div className="space-y-2">
@@ -130,6 +132,7 @@ export function ActionButtons({ user, onUserUpdated }: ActionButtonsProps) {
                 onChange={(e) =>
                   setEditedUser({ ...editedUser, lastName: e.target.value })
                 }
+                disabled
               />
             </div>
             <div className="space-y-2">

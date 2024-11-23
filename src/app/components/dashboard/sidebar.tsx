@@ -18,7 +18,6 @@ import { useAuth } from "../authProvider";
 const adminNavItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Inventario", href: "/dashboard/inventory", icon: Package },
-  { name: "Clientes", href: "/dashboard/customers", icon: Users },
   { name: "Reportes", href: "/dashboard/reports", icon: BarChart2 },
   { name: "Añadir Producto", href: "/dashboard/add-product", icon: PlusCircle },
   { name: "Configuración", href: "/dashboard/settings", icon: Settings },

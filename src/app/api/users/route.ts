@@ -37,6 +37,14 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+
+  if (name.length > 20 || lastName.length > 20) {
+    return NextResponse.json(
+      { error: "El nombre y apellido no pueden tener más de 20 caracteres" },
+      { status: 400 }
+    );
+  }
+
   if (!email.match(/\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b/gi)) {
     return NextResponse.json(
       { error: "El email no es válido" },
@@ -45,12 +53,14 @@ export async function POST(request: Request) {
   }
 
   if (
-    !password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm)
+    !password.match(
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/
+    )
   ) {
     return NextResponse.json(
       {
         error:
-          "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número.",
+          "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial.",
       },
       { status: 400 }
     );

@@ -25,13 +25,13 @@ export async function PATCH(
     }
     if (
       !newPassword.match(
-        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/
       )
     ) {
       return NextResponse.json(
         {
           error:
-            "La nueva contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número.",
+            "La nueva contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula, un número y un carácter especial.",
         },
         { status: 400 }
       );

@@ -1,3 +1,5 @@
+import { Product } from "@prisma/client";
+
 export interface User {
   id?: string;
   email: string;
@@ -63,4 +65,8 @@ export interface ProductData {
   price: string;
   stock: string;
   isActive?: boolean;
+}
+
+export interface CartItem extends Product {
+  quantity: number;
 }

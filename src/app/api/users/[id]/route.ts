@@ -93,6 +93,7 @@ export async function PATCH(
 ) {
   try {
     const body = await request.json();
+
     const { params } = context;
     const user = await prisma.user.update({
       where: { id: params.id },

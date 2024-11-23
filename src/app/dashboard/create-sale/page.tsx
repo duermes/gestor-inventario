@@ -1,110 +1,105 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Search, Plus, Minus, Trash } from "lucide-react";
+import { Product } from "@prisma/client";
+import { ProductSearch } from "@/app/components/sales/product-search";
+import { ShoppingCart } from "@/app/components/sales/shopping-cart";
+import { useToast } from "@/hooks/use-toast";
+import { CartItem } from "@/app/lib/auth/types";
 
-type CartItem = {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-};
-
-export default function Page() {
-  const [searchTerm, setSearchTerm] = useState("");
+export default function SalesPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const handleAddToCart = (product: Product, quantity: number) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.id === product.id);
+
+      if (existingItem) {
+        return prevCart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+
+      return [...prevCart, { ...product, quantity }];
+    });
+
+    toast({
+      title: "Producto agregado",
+      description: `Se agregó ${quantity} unidades de ${product.name} al carrito`,
+    });
+  };
+
+  const handleUpdateQuantity = (id: string, newQuantity: number) => {
+    if (newQuantity < 3) return;
+
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
+
+  const handleRemoveItem = (id: string) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+  };
+
+  const handleCompleteSale = async () => {
+    try {
+      setIsProcessing(true);
+
+      const response = await fetch("/api/sales", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: cart.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Error al procesar la venta");
+      }
+
+      toast({
+        title: "Venta completada",
+        description: "La venta se ha registrado exitosamente",
+      });
+
+      setCart([]);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Error desconocido",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Generar Venta</h1>
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Buscar Productos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar producto"
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="mt-4">
-              {/* Product search results would go here */}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Carrito de Venta</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Producto</TableHead>
-                  <TableHead>Cantidad</TableHead>
-                  <TableHead>Precio</TableHead>
-                  <TableHead>Subtotal</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {cart.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon">
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span>{item.quantity}</span>
-                        <Button variant="outline" size="icon">
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell>${item.price.toFixed(2)}</TableCell>
-                    <TableCell>
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="icon">
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <div className="text-lg font-bold">Total: ${total.toFixed(2)}</div>
-            <Button size="lg">Completar Venta</Button>
-          </CardFooter>
-        </Card>
+        <ProductSearch onAddToCart={handleAddToCart} />
+        <ShoppingCart
+          items={cart}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+          onCompleteSale={handleCompleteSale}
+          isProcessing={isProcessing}
+        />
       </div>
     </div>
   );
