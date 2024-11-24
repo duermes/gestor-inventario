@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,17 +10,18 @@ import { ProductData } from "@/app/lib/auth/types";
 
 interface SalesPageProps {
   onAddToCart: (product: Product, quantity: number) => void;
+  onCompleteSale: () => void;
 }
 
-export function ProductSearch({ onAddToCart }: SalesPageProps) {
+export function ProductSearch({ onAddToCart, onCompleteSale }: SalesPageProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [inventory, setInventory] = useState<ProductData[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const getInventory = async () => {
-    setLoading(true);
+  const getInventory = useCallback(async () => {
+    setLoading(false);
     try {
       const response = await fetch("/api/products", {
         method: "GET",
@@ -48,11 +49,11 @@ export function ProductSearch({ onAddToCart }: SalesPageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     getInventory();
-  }, []);
+  }, [onCompleteSale]);
 
   const filteredInventory = inventory.filter(
     (item) =>

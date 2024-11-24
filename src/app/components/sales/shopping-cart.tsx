@@ -25,6 +25,7 @@ interface ShoppingCartProps {
   onRemoveItem: (id: string) => void;
   onCompleteSale: () => void;
   isProcessing: boolean;
+  message: string;
 }
 
 export function ShoppingCart({
@@ -33,6 +34,7 @@ export function ShoppingCart({
   onRemoveItem,
   onCompleteSale,
   isProcessing,
+  message,
 }: ShoppingCartProps) {
   const total = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -112,6 +114,7 @@ export function ShoppingCart({
           {isProcessing ? "Procesando..." : "Completar Venta"}
         </Button>
       </CardFooter>
+      <p className="text-sm flex justify-center">{message}</p>
     </Card>
   );
 }

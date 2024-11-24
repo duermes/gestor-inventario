@@ -1,35 +1,39 @@
 "use client";
-
-import { useState } from "react";
 import { Product } from "@prisma/client";
 import { ProductSearch } from "@/app/components/sales/product-search";
 import { ShoppingCart } from "@/app/components/sales/shopping-cart";
-import { useToast } from "@/hooks/use-toast";
 import { CartItem } from "@/app/lib/auth/types";
+import { useAuth } from "@/app/components/authProvider";
+import { useCallback, useState } from "react";
 
 export default function SalesPage() {
+  const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { toast } = useToast();
-
+  const [message, setMessage] = useState("");
   const handleAddToCart = (product: Product, quantity: number) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
+      const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
+      const totalRequestedQuantity = currentQuantityInCart + quantity;
+
+      if (totalRequestedQuantity > product.stock) {
+        setMessage("No hay suficiente stock");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
+        return prevCart;
+      }
 
       if (existingItem) {
         return prevCart.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: totalRequestedQuantity }
             : item
         );
       }
 
       return [...prevCart, { ...product, quantity }];
-    });
-
-    toast({
-      title: "Producto agregado",
-      description: `Se agregó ${quantity} unidades de ${product.name} al carrito`,
     });
   };
 
@@ -51,7 +55,7 @@ export default function SalesPage() {
     try {
       setIsProcessing(true);
 
-      const response = await fetch("/api/sales", {
+      const response = await fetch(`/api/sales/${user.id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,27 +68,31 @@ export default function SalesPage() {
           })),
         }),
       });
+      const res = await response.json();
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Error al procesar la venta");
+        setMessage(res.error);
+
+        return;
       }
 
-      toast({
-        title: "Venta completada",
-        description: "La venta se ha registrado exitosamente",
-      });
+      if (res.error) {
+        setMessage(res.error);
+
+        return;
+      }
+
+      setMessage("La venta se ha registrado exitosamente");
 
       setCart([]);
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Error desconocido",
-        variant: "destructive",
-      });
+      console.log(error);
+      setMessage("Ha ocurrido un error desconocido");
     } finally {
       setIsProcessing(false);
+      setTimeout(() => {
+        setMessage("");
+      }, 2000);
     }
   };
 
@@ -92,13 +100,17 @@ export default function SalesPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Generar Venta</h1>
       <div className="grid gap-6 md:grid-cols-2">
-        <ProductSearch onAddToCart={handleAddToCart} />
+        <ProductSearch
+          onAddToCart={handleAddToCart}
+          onCompleteSale={handleCompleteSale}
+        />
         <ShoppingCart
           items={cart}
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
           onCompleteSale={handleCompleteSale}
           isProcessing={isProcessing}
+          message={message}
         />
       </div>
     </div>

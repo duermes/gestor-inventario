@@ -1,3 +1,4 @@
+import { CartItem } from "@/app/lib/auth/types";
 import prisma from "@/app/lib/db";
 import { NextResponse } from "next/server";
 
@@ -11,7 +12,21 @@ export async function POST(
     const body = await request.json();
     const { items } = body;
 
-    const invalidItems = items.filter((item: any) => item.quantity < 3);
+    if (!params?.id) {
+      return NextResponse.json(
+        { error: "ID de usuario no proporcionado" },
+        { status: 400 }
+      );
+    }
+
+    if (!items || items.length === 0) {
+      return NextResponse.json(
+        { error: "No se enviaron productos para la venta" },
+        { status: 400 }
+      );
+    }
+
+    const invalidItems = items.filter((item: CartItem) => item.quantity < 3);
     if (invalidItems.length > 0) {
       return NextResponse.json(
         { error: "La cantidad mínima por producto es 3 unidades" },
