@@ -13,7 +13,6 @@ export default function Page() {
       <Tabs defaultValue="sales">
         <TabsList>
           <TabsTrigger value="sales">Ventas</TabsTrigger>
-          <TabsTrigger value="dates">Por fechas</TabsTrigger>
           <TabsTrigger value="stats">Estadística</TabsTrigger>
           <TabsTrigger value="deleted">Eliminados</TabsTrigger>
           <TabsTrigger value="profit">Ingresos/Utilidad</TabsTrigger>
@@ -29,22 +28,8 @@ export default function Page() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="dates">
-          <Card>
-            <CardHeader>
-              <CardTitle>Reportes por Fechas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DatesReport />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         <TabsContent value="stats">
           <Card>
-            <CardHeader>
-              <CardTitle>Estadísticas de Productos</CardTitle>
-            </CardHeader>
             <CardContent>
               <StatsReport />
             </CardContent>
