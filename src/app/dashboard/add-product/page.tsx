@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductData } from "@/app/lib/auth/types";
+import { useAuth } from "@/app/components/authProvider";
 
 export default function AddProductPage() {
   const [loading, setLoading] = useState(false);
@@ -34,8 +35,8 @@ export default function AddProductPage() {
     color: "colores comerciales",
     price: "",
     stock: "",
-    imageUrl: "",
   });
+  const { user } = useAuth();
 
   const resetForm = () => {
     setFormData({
@@ -47,7 +48,6 @@ export default function AddProductPage() {
       color: "colores comerciales",
       price: "",
       stock: "",
-      imageUrl: "",
     });
   };
 
@@ -61,7 +61,7 @@ export default function AddProductPage() {
   const createProduct = async (productData: ProductData) => {
     try {
       setLoading(true);
-      const res = await fetch("/api/products", {
+      const res = await fetch(`/api/products?userId=${user.id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

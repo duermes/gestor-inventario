@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Edit, Trash } from "lucide-react";
 import React, { useState } from "react";
+import { useAuth } from "../../authProvider";
 
 export function ActionButtons({
   product,
@@ -35,18 +36,22 @@ export function ActionButtons({
   const [editedProduct, setEditedProduct] = useState(product);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const { user } = useAuth();
 
   const handleEdit = async () => {
     setIsLoading(true);
     setError("");
     try {
-      const response = await fetch(`/api/products/${product.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editedProduct),
-      });
+      const response = await fetch(
+        `/api/products/${product.id}?userId=${user.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editedProduct),
+        }
+      );
 
       const data = await response.json();
       if (!response.ok) {
@@ -58,6 +63,7 @@ export function ActionButtons({
         onProductUpdate();
       }
     } catch (error) {
+      console.log(error);
       setError("Ha ocurrido un error actualizando el producto.");
     } finally {
       setIsLoading(false);
@@ -68,17 +74,24 @@ export function ActionButtons({
     try {
       setIsLoading(true);
       setError("");
-      const response = await fetch(`/api/products/${product.id}?delete=true`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/products/${product.id}?delete=true&userId=${user.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const res = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to delete user");
+        return setError(res.error);
       }
+
       setIsDeleteOpen(false);
       if (onProductUpdate) {
         onProductUpdate();
       }
     } catch (error) {
+      console.log(error);
       setError(error.message);
     } finally {
       setIsLoading(false);

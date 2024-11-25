@@ -62,21 +62,25 @@ enum MaterialType {
 enum Actions {
   INVENTARIO
   NUEVO_PRODUCTO
+  RETIRAR_PRODUCTO
   ELIMINAR_PRODUCTO
+  ACTIVAR_PRODUCTO
   ACTUALIZAR_PRODUCTO
-  USUARIO
-  NUEVO_USUARIO
-  ELIMINAR_USUARIO
-  ACTUALIZAR_USUARIO
-
 }
 
 model Logs {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  action    String
+  action    Actions
+  productId String?
+  productName String?
+  description String?
+  quantity  Int?    
   createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([productId])
 }
 
 model Product {
@@ -92,7 +96,7 @@ model Product {
   isActive    Boolean         @default(true)
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
-  saleItems   SaleItem[]     
+  saleItems   SaleItem[]   
 }
 
 model SaleItem {

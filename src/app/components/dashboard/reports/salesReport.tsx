@@ -44,7 +44,7 @@ export function SalesReport() {
       setData(result);
     } catch (error) {
       console.error("Error fetching report:", error);
-      setError("Error fetching report");
+      setError("Error obteniendo reporte");
     } finally {
       setLoading(false);
     }
@@ -160,8 +160,9 @@ export function SalesReport() {
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center">
-                  {error} {loading && "Cargando..."}
+                <TableCell colSpan={4} className="text-center">
+                  {error ||
+                    (loading ? "Cargando..." : "No hay datos disponibles")}
                 </TableCell>
               </TableRow>
             ) : (

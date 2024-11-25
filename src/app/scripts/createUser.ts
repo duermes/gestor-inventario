@@ -3,7 +3,7 @@ import prisma from "../lib/db";
 
 export async function createUser() {
   const email = "admin@admin.com";
-  const password = "admin123";
+  const password = "Admin123$";
   const name = "Lorena";
   const lastName = "Kim";
   const role = "ADMIN";

@@ -14,9 +14,18 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
   const body = await req.json();
   const { name, description, category, material, size, color, price, stock } =
     body;
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Usuario no proporcionado" },
+      { status: 400 }
+    );
+  }
   if (!name || !category || !material || !size || !color || !price || !stock) {
     return NextResponse.json(
       {
@@ -75,6 +84,17 @@ export async function POST(req: Request) {
         ...(stock && { stock: parseInt(stock) }),
       },
     });
+
+    await prisma.logs.create({
+      data: {
+        userId,
+        action: "NUEVO_PRODUCTO",
+        productId: product.id,
+        productName: product.name,
+        quantity: product.stock,
+      },
+    });
+
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
     console.log(error);

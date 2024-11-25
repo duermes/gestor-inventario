@@ -36,7 +36,16 @@ export async function GET(req: Request, context: { params: { id: string } }) {
 export async function PATCH(req: Request, context: { params: { id: string } }) {
   try {
     const { params } = context;
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
     const body = await req.json();
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Parámetro de usuario no proporcionado" },
+        { status: 400 }
+      );
+    }
     const { name, description, category, material, size, color, price, stock } =
       body;
     if (
@@ -93,27 +102,57 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
       );
     }
 
-    return prisma.product
-      .update({
+    const currentProduct = await prisma.product.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!currentProduct) {
+      return NextResponse.json(
+        { error: "Producto no encontrado" },
+        { status: 404 }
+      );
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedProduct = await tx.product.update({
         where: { id: params.id },
         data: body,
-      })
-      .then(() => {
-        return NextResponse.json(
-          {
-            message: "Producto actualizado exitosamente.",
-          },
-          { status: 200 }
-        );
-      })
-      .catch(() => {
-        return NextResponse.json(
-          {
-            error: "Error al actualizar producto",
-          },
-          { status: 500 }
-        );
       });
+      if (currentProduct.isActive !== updatedProduct.isActive) {
+        await tx.logs.create({
+          data: {
+            userId: userId,
+            action: updatedProduct.isActive
+              ? "ACTIVAR_PRODUCTO"
+              : "RETIRAR_PRODUCTO",
+            productId: updatedProduct.id,
+            productName: updatedProduct.name,
+            description: `Estado cambiado a ${
+              updatedProduct.isActive ? "activo" : "inactivo"
+            }`,
+          },
+        });
+      }
+
+      if (currentProduct.stock !== updatedProduct.stock) {
+        await tx.logs.create({
+          data: {
+            userId,
+            action: "INVENTARIO",
+            productId: updatedProduct.id,
+            productName: updatedProduct.name,
+            quantity: updatedProduct.stock - currentProduct.stock,
+            description: `Stock actualizado de ${currentProduct.stock} a ${updatedProduct.stock}`,
+          },
+        });
+      }
+
+      return updatedProduct;
+    });
+    return NextResponse.json(
+      { message: "Producto actualizado exitosamente." },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { error: "Error al actualizar producto" },
@@ -126,68 +165,75 @@ export async function DELETE(
   req: Request,
   context: { params: { id: string } }
 ) {
-  const { params } = context;
-  const { searchParams } = new URL(req.url);
-  const toDelete = searchParams.get("delete");
+  try {
+    const { params } = context;
+    const { searchParams } = new URL(req.url);
+    const toDelete = searchParams.get("delete");
+    const userId = searchParams.get("userId");
 
-  if (toDelete !== "true") {
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Parámetro de usuario no proporcionado" },
+        { status: 400 }
+      );
+    }
+
+    if (toDelete !== "true") {
+      return NextResponse.json(
+        { error: "El parámetro 'delete' debe ser 'true'." },
+        { status: 400 }
+      );
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!product) {
+      return NextResponse.json(
+        {
+          error: "Producto no encontrado.",
+        },
+        { status: 404 }
+      );
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.saleItem.deleteMany({
+        where: { productId: params.id },
+      });
+
+      await tx.logs.deleteMany({
+        where: { productId: params.id },
+      });
+
+      await tx.logs.create({
+        data: {
+          userId: userId,
+          action: "ELIMINAR_PRODUCTO",
+          productId: params.id,
+          productName: product.name,
+        },
+      });
+
+      await tx.product.delete({
+        where: { id: params.id },
+      });
+    });
+
     return NextResponse.json(
-      { error: "El parámetro 'delete' debe ser 'true'." },
-      { status: 400 }
+      {
+        message: "Producto eliminado exitosamente.",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error al eliminar producto:", error);
+    return NextResponse.json(
+      {
+        error: "Error al eliminar producto",
+      },
+      { status: 500 }
     );
   }
-  return prisma.product
-    .delete({
-      where: { id: params.id },
-    })
-    .then(() => {
-      return NextResponse.json(
-        {
-          message: "Usuario eliminado exitosamente.",
-        },
-        { status: 200 }
-      );
-    })
-    .catch((err) => {
-      return NextResponse.json(
-        {
-          error: "Error al eliminar usuario",
-        },
-        { status: 500 }
-      );
-    });
 }
-
-// export async function DELETE(
-//   req: Request,
-//   context: { params: { id: string } }
-// ) {
-//   try {
-//     const { params } = context;
-//     const { searchParams } = new URL(req.url);
-//     const toDelete = searchParams.get("delete");
-
-// if (toDelete !== "true") {
-//   return NextResponse.json(
-//     { error: "El parámetro 'delete' debe ser 'true'." },
-//     { status: 400 }
-//   );
-// }
-
-//     await prisma.product.delete({
-//       where: { id: params.id },
-//     });
-
-//     return NextResponse.json(
-//       { message: "Producto eliminado exitosamente." },
-//       { status: 200 }
-//     );
-//   } catch (error) {
-//     console.error("Error al eliminar el producto:", error);
-
-//     return NextResponse.json(
-//       { error: "Ocurrió un error al eliminar el producto." },
-//       { status: 500 }
-//     );
-//   }
-// }
