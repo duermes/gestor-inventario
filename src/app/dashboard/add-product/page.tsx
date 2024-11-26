@@ -76,6 +76,7 @@ export default function AddProductPage() {
         return { error: data.error };
       }
     } catch (error) {
+      console.log(error);
       return { error: "Error al crear producto" };
     } finally {
       resetMessages();

@@ -25,14 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { json2csv } from "json-2-csv";
 
 type StatData = {
@@ -43,25 +35,12 @@ type StatData = {
   count: number;
 };
 
-type LogData = {
-  id: string;
-  action: string;
-  productId: string;
-  productName: string;
-  quantity: number;
-  user: {
-    name: string;
-    lastName: string;
-  };
-  createdAt: string;
-};
-
 export function StatsReport() {
   const [reportType, setReportType] = useState("ventas");
   const [period, setPeriod] = useState("daily");
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const [stats, setStats] = useState<Record<string, StatData>>({
     ventas: {
       max: 0,
@@ -81,7 +60,7 @@ export function StatsReport() {
 
   const fetchReport = async () => {
     setLoading(true);
-    setError(null);
+    setError("");
     try {
       const response = await fetch(`/api/sales/stats?period=${period}`);
       if (!response.ok) {
@@ -210,6 +189,7 @@ export function StatsReport() {
           )}
           {downloading ? "Descargando..." : "Descargar"}
         </Button>
+        {error && <p className="text-red-500">{error}</p>}
       </div>
 
       <Tabs defaultValue="estadisticas" className="space-y-4">

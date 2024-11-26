@@ -42,16 +42,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const { password: _, ...userWithoutPassword } = user;
+    // const { password: _, ...userWithoutPassword } = user;
 
     return NextResponse.json(
       {
-        user: userWithoutPassword,
+        user: user,
         message: "Inicio de sesión exitoso",
       },
       { status: 200 }
     );
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       {
         error:

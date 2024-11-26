@@ -1,5 +1,5 @@
 import prisma from "@/app/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
@@ -74,6 +74,7 @@ export async function DELETE(
         { status: 200 }
       );
     } catch (error) {
+      console.log(error);
       return NextResponse.json(
         { error: "Error al eliminar usuario." },
         { status: 500 }
@@ -115,6 +116,7 @@ export async function PATCH(
       message: "Usuario actualizado exitosamente",
     });
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Error al actualizar datos en el usuario" },
       { status: 400 }

@@ -21,6 +21,7 @@ export async function GET() {
 
     return NextResponse.json(users, { status: 200 });
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Error al obtener usuarios" },
       { status: 500 }
@@ -91,15 +92,16 @@ export async function POST(request: Request) {
       },
     });
 
-    const { password: _, ...userWithoutPassword } = user;
+    // const { password: _, ...userWithoutPassword } = user;
     return NextResponse.json(
       {
-        user: userWithoutPassword,
+        user: user,
         message: "Usuario creado exitosamente.",
       },
       { status: 201 }
     );
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Error al crear usuario." },
       { status: 500 }

@@ -62,6 +62,7 @@ export default function Page() {
         return { error: data.error };
       }
     } catch (error) {
+      console.log(error);
       setLoading(false);
       return { error: "Error al crear el usuario" };
     }

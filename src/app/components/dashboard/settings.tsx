@@ -1,6 +1,6 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Lock, Mail } from "lucide-react";
+import { Lock } from "lucide-react";
 
 import {
   Card,
@@ -43,6 +43,7 @@ export default function Settings() {
       const res = await changePassword(formData.password, formData.newPassword);
       setMessage(res);
     } catch (error) {
+      console.log(error);
       setMessage("Error al crear usuario");
     }
   };

@@ -10,7 +10,6 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // implementar lógica (preferible moverlo a libs y trabajarlo con components)
     setIsSubmitted(true);
   };
 

@@ -97,6 +97,7 @@ export async function PATCH(
       { status: 200 }
     );
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Ha ocurrido un error al cambiar la contraseña." },
       { status: 500 }

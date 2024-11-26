@@ -46,16 +46,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    // await fetch(`api/auth/logout`, {
-    //   method: "POST",
-    //   credentials: "include",
-    // }).then(async (res) => {
-    //   if (res.status == 200) {
-    //     router.push("/");
-    //     setUser(null);
-    //     setLoading(false);
-    //   }
-    // });
     router.push("/");
     setUser(null);
     setLoading(false);
@@ -119,64 +109,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return data.error;
       }
     } catch (error) {
+      console.log(error);
       setLoading(false);
       return "Error al cambiar la contraseña";
     }
   };
 
-  // const requestReset = async (email: string, token: string) => {
-  //   await fetch(`${process.env.NEXT_PUBLIC_API}/auth/resetPassword/request`, {
-  //     method: "POST",
-  //     credentials: "include",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       email: email,
-  //       token: token,
-  //     }),
-  //   }).then(async (res) => {
-  //     if (res.status == 200) {
-  //       setLoading(false);
-  //     }
-  //   });
-  // };
-
-  // const resetPassword = async (password: string, token: string) => {
-  //   await fetch(`${process.env.NEXT_PUBLIC_API}/auth/resetPassword/submit`, {
-  //     method: "POST",
-  //     credentials: "include",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       password: password,
-  //       token: token,
-  //     }),
-  //   }).then(async (res) => {
-  //     if (res.status == 200) {
-  //       setLoading(false);
-  //     }
-  //   });
-  // };
-
   useEffect(() => {
-    // if (!user) {
-    //   const fetchUserData = async () => {
-    //     await fetch(`${process.env.NEXT_PUBLIC_API}/users/profile`, {
-    //       method: "GET",
-    //       credentials: "include",
-    //     })
-    //       .then(async (res) => {
-    //         if (res.status == 200) {
-    //           const data = await res.json();
-    //           setUser(data);
-    //         }
-    //       })
-    //       .finally(() => setLoading(false));
-    //   };
-    //   fetchUserData();
-    // }
     if (!user) {
       router.push("/");
     }

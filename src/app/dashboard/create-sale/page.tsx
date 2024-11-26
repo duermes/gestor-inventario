@@ -4,7 +4,7 @@ import { ProductSearch } from "@/app/components/sales/product-search";
 import { ShoppingCart } from "@/app/components/sales/shopping-cart";
 import { CartItem } from "@/app/lib/auth/types";
 import { useAuth } from "@/app/components/authProvider";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 export default function SalesPage() {
   const { user } = useAuth();

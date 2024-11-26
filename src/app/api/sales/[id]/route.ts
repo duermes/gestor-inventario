@@ -35,7 +35,7 @@ export async function POST(
     }
 
     const total = items.reduce(
-      (sum: number, item: any) => sum + item.price * item.quantity,
+      (sum: number, item: CartItem) => sum + item.price * item.quantity,
       0
     );
 
@@ -44,7 +44,7 @@ export async function POST(
         data: {
           userId: params.id,
           items: {
-            create: items.map((item: any) => ({
+            create: items.map((item: CartItem) => ({
               productId: item.id,
               quantity: item.quantity,
               price: item.price,

@@ -1,36 +1,37 @@
 import prisma from "@/app/lib/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: Request, context: { params: { id: string } }) {
-  const { params } = context;
-  await prisma.product
-    .findUnique({
-      where: { id: params.id },
-    })
-    .then((res) => {
-      if (!res) {
-        return NextResponse.json(
-          {
-            error: "Producto no encontrado.",
-          },
-          { status: 404 }
-        );
-      }
-      return NextResponse.json(
-        {
-          res,
-        },
-        { status: 200 }
-      );
-    })
-    .catch(() => {
-      return NextResponse.json(
-        {
-          error: "Ha ocurrido un error encontrando el producto",
-        },
-        { status: 500 }
-      );
+export type GET = (
+  request: NextRequest,
+  context: { params: { id: string } }
+) => Promise<NextResponse>;
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+): Promise<NextResponse> {
+  const id = params.id;
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
     });
+
+    if (!product) {
+      return NextResponse.json(
+        { error: "Producto no encontrado." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(product, { status: 200 });
+  } catch (error) {
+    console.error("Error al buscar el producto:", error);
+    return NextResponse.json(
+      { error: "Ha ocurrido un error encontrando el producto" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PATCH(req: Request, context: { params: { id: string } }) {
@@ -154,6 +155,7 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
       { status: 200 }
     );
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Error al actualizar producto" },
       { status: 400 }

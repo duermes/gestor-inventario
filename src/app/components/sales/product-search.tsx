@@ -45,6 +45,7 @@ export function ProductSearch({ onAddToCart, onCompleteSale }: SalesPageProps) {
       );
       setInventory(availableProducts);
     } catch (error) {
+      console.log(error);
       setError("Error al cargar los productos");
     } finally {
       setLoading(false);

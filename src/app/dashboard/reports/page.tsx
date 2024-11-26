@@ -1,4 +1,3 @@
-import { DatesReport } from "@/app/components/dashboard/reports/datesReport";
 import { DeletedProductsReport } from "@/app/components/dashboard/reports/deletedProductsReport";
 import { ProfitReport } from "@/app/components/dashboard/reports/profitReport";
 import { SalesReport } from "@/app/components/dashboard/reports/salesReport";

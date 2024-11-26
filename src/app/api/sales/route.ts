@@ -59,7 +59,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(sales);
   } catch (error) {
-    console.error("Error en reporte de ventas");
+    console.error(error);
     return NextResponse.json(
       { error: "Error al generar el reporte" },
       { status: 500 }

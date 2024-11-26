@@ -49,9 +49,9 @@ export interface AuthContextType {
     lastname: string,
     password: string,
     role: string
-  ) => Promise<{ data: any; status: number } | undefined>;
+  ) => Promise<{ data: User; status: number } | undefined>;
   loading: boolean;
-  changePassword: (password: string, newPassword: string) => Promise<any>;
+  changePassword: (password: string, newPassword: string) => Promise<string>;
 }
 
 export interface ProductData {

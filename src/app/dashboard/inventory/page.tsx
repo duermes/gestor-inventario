@@ -10,8 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Edit, Trash } from "lucide-react";
+import { Search } from "lucide-react";
 import { useAuth } from "@/app/components/authProvider";
 import { ProductData } from "@/app/lib/auth/types";
 import { ActionButtons } from "@/app/components/dashboard/inventory/actionButtons";
@@ -62,6 +61,10 @@ export default function InventoryPage() {
 
   if (!user) {
     return <div>Debes de iniciar sesión para poder ver esta página.</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   if (loading) {

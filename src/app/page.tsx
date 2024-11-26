@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { LoginForm } from "./components/auth/loginForm";
-import { createUser } from "./scripts/createUser";
 
 export default function Home() {
   return (
